@@ -1,29 +1,152 @@
 <!DOCTYPE html>
-<html>
-<head><title>EcoReport - Persampahan</title></head>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoReport - Persampahan</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f7f4;
+            color: #2d3748;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            color: #2c7a7b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+        h2 {
+            color: #285e61;
+            font-size: 1.2rem;
+            margin-top: 30px;
+            border-left: 4px solid #38b2ac;
+            padding-left: 10px;
+        }
+        .info-box {
+            background-color: #e6fffa;
+            color: #234e52;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #f7fafc;
+        }
+        button {
+            background-color: #319795;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background-color: #285e61;
+        }
+        .report-list {
+            list-style: none;
+            padding: 0;
+        }
+        .report-list li {
+            background: #f7fafc;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-link {
+            background-color: #4fd1c5;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-link:hover {
+            background-color: #38b2ac;
+        }
+        .empty-state {
+            text-align: center;
+            color: #a0aec0;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
 <body>
-    <h2>Fitur 1: Jadwal Pengangkutan</h2>
-    <p>Truk sampah rutin keliling ITENAS setiap jam 08.00 pagi dan 16.00 sore.</p>
-    <hr>
-    
-    <h2>Fitur 2: Lapor Sampah Liar (Upload ke S3)</h2>
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        Lokasi Sampah: <input type="text" name="lokasi" required> <br><br>
-        Foto Bukti: <input type="file" name="foto" required> <br><br>
-        <button type="submit">Lapor Sekarang!</button>
-    </form>
-    <hr>
-    
-    <h2>Fitur 3: Data Laporan Masyarakat (Dari Database)</h2>
-    <ul>
-        {{range .}}
-        <li>
-            <b>Lokasi:</b> {{.lokasi}} <br>
-            <b>Foto:</b> <a href="{{.foto_url}}" target="_blank">Lihat Bukti (S3)</a>
-        </li>
-        {{else}}
-        <p>Belum ada laporan sampah.</p>
-        {{end}}
-    </ul>
+    <div class="container">
+        <h1>🌱 EcoReport ITENAS</h1>
+
+        <div class="info-box">
+            <strong>🚛 Fitur 1: Jadwal Pengangkutan</strong><br>
+            Truk sampah rutin keliling area kampus setiap jam <b>08.00 pagi</b> dan <b>16.00 sore</b>.
+        </div>
+
+        <h2>📸 Fitur 2: Lapor Sampah Liar</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Lokasi Sampah:</label>
+                <input type="text" name="lokasi" placeholder="Contoh: Belakang Gedung Fakultas Teknologi Industri" required>
+            </div>
+            <div class="form-group">
+                <label>Foto Bukti:</label>
+                <input type="file" name="foto" required>
+            </div>
+            <button type="submit">🚀 Lapor Sekarang!</button>
+        </form>
+
+        <h2>📋 Fitur 3: Data Laporan Masyarakat</h2>
+        <ul class="report-list">
+            {{range .}}
+            <li>
+                <div>
+                    <strong>📍 Lokasi:</strong> {{.lokasi}}
+                </div>
+                <a href="{{.foto_url}}" class="btn-link" target="_blank">Lihat Bukti</a>
+            </li>
+            {{else}}
+            <li class="empty-state">
+                Belum ada laporan sampah saat ini. Data kosong.
+            </li>
+            {{end}}
+        </ul>
+    </div>
 </body>
 </html>
