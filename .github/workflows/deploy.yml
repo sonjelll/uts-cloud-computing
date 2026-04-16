@@ -17,14 +17,16 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
           script: |
-            # Clone repo (ubah link github ini jadi link repo kamu!)
-            git clone https://github.com/sonjelll/uts-cloud-computing.git app-uts || true
-            cd app-uts
-            git pull origin main
+            # Bersihkan folder lama agar tidak bentrok
+            rm -rf uts-cloud-computing
             
-            # Matikan container lama
-            sudo docker stop web-uts || true
-            sudo docker rm web-uts || true
+            # Clone kode terbaru yang fresh
+            git clone https://github.com/sonjelll/uts-cloud-computing.git
+            cd uts-cloud-computing
+            
+            # Hentikan dan hapus container lama
+            sudo docker stop web-app || true
+            sudo docker rm web-app || true
             
             # Build docker
             sudo docker build -t web-uts-image .
