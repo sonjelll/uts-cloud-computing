@@ -20,7 +20,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # Pindah ke folder aplikasi (atau clone jika belum ada)
-            git clone https://github.com/USERNAME-KAMU/uts-cloud-computing.git temp-app || true
+            git clone https://github.com/sonjelll/uts-cloud-computing.git temp-app || true
             cd temp-app && git pull origin main
             
             # Hentikan dan hapus container lama agar tidak bentrok
