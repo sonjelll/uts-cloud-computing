@@ -1,0 +1,37 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Pindah ke folder aplikasi (atau clone jika belum ada)
+            git clone https://github.com/USERNAME-KAMU/uts-cloud-computing.git temp-app || true
+            cd temp-app && git pull origin main
+            
+            # Hentikan dan hapus container lama agar tidak bentrok
+            sudo docker stop web-app || true
+            sudo docker rm web-app || true
+            
+            # Build dan jalankan Docker baru
+            sudo docker build -t cloud-app .
+            sudo docker run -d -p 8080:8080 --name web-app \
+              -e DB_HOST='[Isi_Endpoint_RDS_Kamu]' \
+              -e DB_USER='admin' \
+              -e DB_PASS='Sondang123!' \
+              -e S3_BUCKET='uts-cloud-sondang-bucket' \
+              cloud-app
