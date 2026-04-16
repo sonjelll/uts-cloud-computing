@@ -1,5 +1,3 @@
-name: CI/CD to AWS EC2
-
 on:
   push:
     branches:
@@ -34,37 +32,11 @@ jobs:
             # Jalankan docker baru dengan Environment Variables AWS! (Isi bagian yg di dalam kurung siku dengan datamu)
             sudo docker run -d -p 8080:8080 --name web-uts \
               -e DB_USER='admin' \
-              -e DB_PASS='sondang17' \
+              -e DB_PASS='${{ secrets.DB_PASS }}' \
               -e DB_HOST='db-uts-sondang.cps0acgo6m1b.ap-southeast-2.rds.amazonaws.com' \
               -e DB_NAME='db_uts_sondang' \
               -e AWS_REGION='ap-southeast-1' \
               -e S3_BUCKET='uts-cloud-sondang-bucket' \
-              -e AWS_ACCESS_KEY_ID='-----BEGIN RSA PRIVATE KEY-----
-                                    MIIEpAIBAAKCAQEAl+oM6FQ2NGqptX33E3BCxJRfUkTHNqAEKoUxm7N2aTjQThXJ
-                                    us4waPBYaF094JjAvbDO7JsohR1ZyTHV21LQgUF4IqT/cvZ3jPj1mT0v5IteWgyY
-                                    VrrCPISniT36ZJJ9khsTt/TPWFKZQCDznDn/t8l3V+/hkl4z3yNKQ75ibzvhPTwA
-                                    VUVFKDQp+aqi73O5p67/rDC+4vItguGIBww1QNKTswabbQEMy8rUSi26QgPl+AP3
-                                    lSH6BtAWbMSCxNZzC9UolOla6bg2WtD6c/0oYdITft4MKnVuQtNeUXHXulBGjUbA
-                                    R+qm1BbEoojpoG836Yt1FruV/E3T5+WLpJNfbQIDAQABAoIBAAh1Vqyk67O1cKeT
-                                    UOt7J6yMWlZZUAJBnJnFesKhlmk7aZW/btEA4/8jyrhc4LIdrzWgn5Ta+sGWpcYn
-                                    CTJCBSv9OjQrnbGH+ZYW0o3qszz1aZZ39w91LJV0CWQB2Gw7H9S/vzRR5C2Vw8Sn
-                                    UQkUzaEtDYEO8S9WIWs+Ksdk1VQ+GlEdsLQyRjsyVDNTmZwbLeeuNRbOycPldr8G
-                                    GWs+KCZSjEcBSyFPJfJR2tq0Y2bzm/TJZCI3x/Yu6yNEhaVitLPhRfUtWRVqxC86
-                                    xbkQ/UyN21WH0RHZldEIC0UENiQYP+rpufkj9RdpzfhgwyBg/dRVMYk1Ma53OlzM
-                                    IhazB70CgYEAx6DxCK8/Dv64ecaFsEehnZYwM0LyhaqiqK2BGh6mGFIUAFAVHPck
-                                    5K2AhrgO2CUCYtQFHVpeEH+VpmsJDGSXJiqSrgEl9ufHfz8A++LIYCwTyQiyvozU
-                                    udUBXY5dkSODFAsGKdaFsVHTFImAXJTlQpf+fGjxFziHLUwW75dK+PcCgYEAws/b
-                                    boBIIN8l/+vhLnMCBopL4ZjjQsiJJGeX0lj1jg+ZR9wQJIxKWqsJm1Wy+btq9qj8
-                                    wNxFVnu7JtIevU90iu1UB31KtCR3uUilM9O8BIGSPZiI/WFjRXgAtLVdcAenzZzd
-                                    0NJ+1JRfO3xAx+VvkJ8kTrt9iqUfwuE6GM0m1bsCgYBgUOJ6kjMWhQd0mbf+6VCs
-                                    u73dvbtNipqYT74uYAM7UL6duAW3x/Zg7uVIGp3u40xXanxdQTCJPUVy2cmv1Qio
-                                    PXovwhYTHpk+Z6ON5ElRPXL+V9gF3+TzFDZocTvrvvqLPRZoMTyn5Ra2nfD0ulIy
-                                    4yrB09AeqANwc3nNd22Q2QKBgQCB2xXUuZPavYRR7ESktqrB+0uLbGMIcC3iY18z
-                                    KnM8J6+v08O66PzjJSF5No3fo4swMgKQ+AMMG9vri6JL5Hu1427gsyapn6lii0b7
-                                    nga1Jj1564RdCZ6nfs9RpZdMBv5Ws1q0SKucPe6g8zknRguw5jPIe3e6hEkAmSsl
-                                    vxJE4wKBgQCJO1Pcs6el3a8X5pynXxU1BKU9SYZvukQR1JH6/zzAfN6uIYddaoyb
-                                    fzbp/u2sBN8psUv05KTFYkdSnN7VM0DeNpDWvDqTWekPezdA7L25nHcZJ6Av4WK2
-                                    qa3TchuuXIwdjEAGrTCBJLcC5x4yzPkTmITGlT1e2oIwPTbioKnWTg==
-                                    -----END RSA PRIVATE KEY-----' \
-              -e AWS_SECRET_ACCESS_KEY='AKIA55XN5DKBYYY7DD5D' \
+              -e AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}' \
+              -e AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
               web-uts-image
