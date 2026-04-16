@@ -30,8 +30,8 @@ jobs:
             # Build dan jalankan Docker baru
             sudo docker build -t cloud-app .
             sudo docker run -d -p 8080:8080 --name web-app \
-              -e DB_HOST='[Isi_Endpoint_RDS_Kamu]' \
+              -e DB_HOST='db-uts-sondang.cps0acgo6m1b.ap-southeast-2.rds.amazonaws.com' \
               -e DB_USER='admin' \
-              -e DB_PASS='Sondang123!' \
+              -e DB_PASS='sondang17' \
               -e S3_BUCKET='uts-cloud-sondang-bucket' \
               cloud-app
