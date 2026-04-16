@@ -3,23 +3,13 @@
 <head><title>EcoReport - Persampahan</title></head>
 <body>
     <h2>Fitur 1: Jadwal Pengangkutan</h2>
-    <p>Truk sampah rutin keliling ITENAS setiap jam 08.00 pagi dan 16.00 sore.</p>
+    <p>Truk sampah rutin keliling setiap jam 08.00 pagi dan 16.00 sore.</p>
     <hr>
-    <h2>Fitur 2: Lapor Sampah Liar (Upload ke S3)</h2>
+    <h2>Fitur 2: Lapor Sampah Liar (Upload S3)</h2>
     <form action="/upload" method="POST" enctype="multipart/form-data">
         Lokasi Sampah: <input type="text" name="lokasi" required> <br><br>
         Foto Bukti: <input type="file" name="foto" required> <br><br>
         <button type="submit">Lapor Sekarang!</button>
     </form>
-    <hr>
-    <h2>Fitur 3: Data Laporan Masyarakat (Dari RDS)</h2>
-    <ul>
-        {{range .}}
-        <li>
-            <b>Lokasi:</b> {{.lokasi}} <br>
-            <b>Foto:</b> <a href="{{.foto_url}}" target="_blank">Lihat Bukti (S3)</a>
-        </li>
-        {{end}}
-    </ul>
 </body>
 </html>

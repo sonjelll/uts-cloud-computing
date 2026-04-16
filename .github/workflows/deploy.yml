@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: CI/CD to AWS EC2
 
 on:
   push:
@@ -9,34 +9,85 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Deploy via SSH
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 1. Install Docker secara otomatis
-            sudo apt-get update -y
-            sudo apt-get install docker.io -y
-            sudo systemctl start docker
+            # Clone repo (ubah link github ini jadi link repo kamu!)
+            git clone https://github.com/sonjelll/uts-cloud-computing.git app-uts || true
+            cd app-uts
+            git pull origin main
             
-            # 2. Pindah ke folder aplikasi (atau clone jika belum ada)
-            git clone https://github.com/sonjelll/uts-cloud-computing.git temp-app || true
-            cd temp-app && git pull origin main
+            # Matikan container lama
+            sudo docker stop web-uts || true
+            sudo docker rm web-uts || true
             
-            # 3. Hentikan dan hapus container lama agar tidak bentrok
-            sudo docker stop web-app || true
-            sudo docker rm web-app || true
+            # Build docker
+            sudo docker build -t web-uts-image .
             
-            # 4. Build dan jalankan Docker baru
-            sudo docker build -t cloud-app .
-            sudo docker run -d -p 8080:8080 --name web-app \
-              -e DB_HOST='db-uts-sondang.cps0acgo6m1b.ap-southeast-2.rds.amazonaws.com' \
+            # Jalankan docker baru dengan Environment Variables AWS! (Isi bagian yg di dalam kurung siku dengan datamu)
+            sudo docker run -d -p 8080:8080 --name web-uts \
               -e DB_USER='admin' \
-              -e DB_PASS='sondang17' \
+              -e DB_PASS='Sondang123!' \
+              -e DB_HOST='db-uts-sondang.cps0acgo6m1b.ap-southeast-2.rds.amazonaws.com' \
+              -e DB_NAME='db_uts_sondang' \
+              -e AWS_REGION='ap-southeast-1' \
               -e S3_BUCKET='uts-cloud-sondang-bucket' \
-              cloud-app
+              -e AWS_ACCESS_KEY_ID='-----BEGIN RSA PRIVATE KEY-----
+                                    MIIEpAIBAAKCAQEAl+oM6FQ2NGqptX33E3BCxJRfUkTHNqAEKoUxm7N2aTjQThXJ
+                                    us4waPBYaF094JjAvbDO7JsohR1ZyTHV21LQgUF4IqT/cvZ3jPj1mT0v5IteWgyY
+                                    VrrCPISniT36ZJJ9khsTt/TPWFKZQCDznDn/t8l3V+/hkl4z3yNKQ75ibzvhPTwA
+                                    VUVFKDQp+aqi73O5p67/rDC+4vItguGIBww1QNKTswabbQEMy8rUSi26QgPl+AP3
+                                    lSH6BtAWbMSCxNZzC9UolOla6bg2WtD6c/0oYdITft4MKnVuQtNeUXHXulBGjUbA
+                                    R+qm1BbEoojpoG836Yt1FruV/E3T5+WLpJNfbQIDAQABAoIBAAh1Vqyk67O1cKeT
+                                    UOt7J6yMWlZZUAJBnJnFesKhlmk7aZW/btEA4/8jyrhc4LIdrzWgn5Ta+sGWpcYn
+                                    CTJCBSv9OjQrnbGH+ZYW0o3qszz1aZZ39w91LJV0CWQB2Gw7H9S/vzRR5C2Vw8Sn
+                                    UQkUzaEtDYEO8S9WIWs+Ksdk1VQ+GlEdsLQyRjsyVDNTmZwbLeeuNRbOycPldr8G
+                                    GWs+KCZSjEcBSyFPJfJR2tq0Y2bzm/TJZCI3x/Yu6yNEhaVitLPhRfUtWRVqxC86
+                                    xbkQ/UyN21WH0RHZldEIC0UENiQYP+rpufkj9RdpzfhgwyBg/dRVMYk1Ma53OlzM
+                                    IhazB70CgYEAx6DxCK8/Dv64ecaFsEehnZYwM0LyhaqiqK2BGh6mGFIUAFAVHPck
+                                    5K2AhrgO2CUCYtQFHVpeEH+VpmsJDGSXJiqSrgEl9ufHfz8A++LIYCwTyQiyvozU
+                                    udUBXY5dkSODFAsGKdaFsVHTFImAXJTlQpf+fGjxFziHLUwW75dK+PcCgYEAws/b
+                                    boBIIN8l/+vhLnMCBopL4ZjjQsiJJGeX0lj1jg+ZR9wQJIxKWqsJm1Wy+btq9qj8
+                                    wNxFVnu7JtIevU90iu1UB31KtCR3uUilM9O8BIGSPZiI/WFjRXgAtLVdcAenzZzd
+                                    0NJ+1JRfO3xAx+VvkJ8kTrt9iqUfwuE6GM0m1bsCgYBgUOJ6kjMWhQd0mbf+6VCs
+                                    u73dvbtNipqYT74uYAM7UL6duAW3x/Zg7uVIGp3u40xXanxdQTCJPUVy2cmv1Qio
+                                    PXovwhYTHpk+Z6ON5ElRPXL+V9gF3+TzFDZocTvrvvqLPRZoMTyn5Ra2nfD0ulIy
+                                    4yrB09AeqANwc3nNd22Q2QKBgQCB2xXUuZPavYRR7ESktqrB+0uLbGMIcC3iY18z
+                                    KnM8J6+v08O66PzjJSF5No3fo4swMgKQ+AMMG9vri6JL5Hu1427gsyapn6lii0b7
+                                    nga1Jj1564RdCZ6nfs9RpZdMBv5Ws1q0SKucPe6g8zknRguw5jPIe3e6hEkAmSsl
+                                    vxJE4wKBgQCJO1Pcs6el3a8X5pynXxU1BKU9SYZvukQR1JH6/zzAfN6uIYddaoyb
+                                    fzbp/u2sBN8psUv05KTFYkdSnN7VM0DeNpDWvDqTWekPezdA7L25nHcZJ6Av4WK2
+                                    qa3TchuuXIwdjEAGrTCBJLcC5x4yzPkTmITGlT1e2oIwPTbioKnWTg==
+                                    -----END RSA PRIVATE KEY-----' \
+              -e AWS_SECRET_ACCESS_KEY='-----BEGIN RSA PRIVATE KEY-----
+                                    MIIEpAIBAAKCAQEAl+oM6FQ2NGqptX33E3BCxJRfUkTHNqAEKoUxm7N2aTjQThXJ
+                                    us4waPBYaF094JjAvbDO7JsohR1ZyTHV21LQgUF4IqT/cvZ3jPj1mT0v5IteWgyY
+                                    VrrCPISniT36ZJJ9khsTt/TPWFKZQCDznDn/t8l3V+/hkl4z3yNKQ75ibzvhPTwA
+                                    VUVFKDQp+aqi73O5p67/rDC+4vItguGIBww1QNKTswabbQEMy8rUSi26QgPl+AP3
+                                    lSH6BtAWbMSCxNZzC9UolOla6bg2WtD6c/0oYdITft4MKnVuQtNeUXHXulBGjUbA
+                                    R+qm1BbEoojpoG836Yt1FruV/E3T5+WLpJNfbQIDAQABAoIBAAh1Vqyk67O1cKeT
+                                    UOt7J6yMWlZZUAJBnJnFesKhlmk7aZW/btEA4/8jyrhc4LIdrzWgn5Ta+sGWpcYn
+                                    CTJCBSv9OjQrnbGH+ZYW0o3qszz1aZZ39w91LJV0CWQB2Gw7H9S/vzRR5C2Vw8Sn
+                                    UQkUzaEtDYEO8S9WIWs+Ksdk1VQ+GlEdsLQyRjsyVDNTmZwbLeeuNRbOycPldr8G
+                                    GWs+KCZSjEcBSyFPJfJR2tq0Y2bzm/TJZCI3x/Yu6yNEhaVitLPhRfUtWRVqxC86
+                                    xbkQ/UyN21WH0RHZldEIC0UENiQYP+rpufkj9RdpzfhgwyBg/dRVMYk1Ma53OlzM
+                                    IhazB70CgYEAx6DxCK8/Dv64ecaFsEehnZYwM0LyhaqiqK2BGh6mGFIUAFAVHPck
+                                    5K2AhrgO2CUCYtQFHVpeEH+VpmsJDGSXJiqSrgEl9ufHfz8A++LIYCwTyQiyvozU
+                                    udUBXY5dkSODFAsGKdaFsVHTFImAXJTlQpf+fGjxFziHLUwW75dK+PcCgYEAws/b
+                                    boBIIN8l/+vhLnMCBopL4ZjjQsiJJGeX0lj1jg+ZR9wQJIxKWqsJm1Wy+btq9qj8
+                                    wNxFVnu7JtIevU90iu1UB31KtCR3uUilM9O8BIGSPZiI/WFjRXgAtLVdcAenzZzd
+                                    0NJ+1JRfO3xAx+VvkJ8kTrt9iqUfwuE6GM0m1bsCgYBgUOJ6kjMWhQd0mbf+6VCs
+                                    u73dvbtNipqYT74uYAM7UL6duAW3x/Zg7uVIGp3u40xXanxdQTCJPUVy2cmv1Qio
+                                    PXovwhYTHpk+Z6ON5ElRPXL+V9gF3+TzFDZocTvrvvqLPRZoMTyn5Ra2nfD0ulIy
+                                    4yrB09AeqANwc3nNd22Q2QKBgQCB2xXUuZPavYRR7ESktqrB+0uLbGMIcC3iY18z
+                                    KnM8J6+v08O66PzjJSF5No3fo4swMgKQ+AMMG9vri6JL5Hu1427gsyapn6lii0b7
+                                    nga1Jj1564RdCZ6nfs9RpZdMBv5Ws1q0SKucPe6g8zknRguw5jPIe3e6hEkAmSsl
+                                    vxJE4wKBgQCJO1Pcs6el3a8X5pynXxU1BKU9SYZvukQR1JH6/zzAfN6uIYddaoyb
+                                    fzbp/u2sBN8psUv05KTFYkdSnN7VM0DeNpDWvDqTWekPezdA7L25nHcZJ6Av4WK2
+                                    qa3TchuuXIwdjEAGrTCBJLcC5x4yzPkTmITGlT1e2oIwPTbioKnWTg==
+                                    -----END RSA PRIVATE KEY-----' \
+              web-uts-image
