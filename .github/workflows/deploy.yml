@@ -1,3 +1,5 @@
+name: CI/CD to AWS EC2
+
 on:
   push:
     branches:
@@ -15,27 +17,28 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
           script: |
-            # Bersihkan folder lama agar tidak bentrok
+            # 1. Masuk ke home dan bersihkan folder lama
+            cd ~
             rm -rf uts-cloud-computing
             
-            # Clone kode terbaru yang fresh
+            # 2. Clone ulang kode paling baru
             git clone https://github.com/sonjelll/uts-cloud-computing.git
             cd uts-cloud-computing
             
-            # Hentikan dan hapus container lama
+            # 3. Hentikan & Hapus kontainer lama (Namanya disamakan: web-app)
             sudo docker stop web-app || true
             sudo docker rm web-app || true
             
-            # Build docker
+            # 4. Build image baru
             sudo docker build -t web-uts-image .
             
-            # Jalankan docker baru dengan Environment Variables AWS! (Isi bagian yg di dalam kurung siku dengan datamu)
-            sudo docker run -d -p 8080:8080 --name web-uts \
+            # 5. Jalankan kontainer baru
+            sudo docker run -d -p 8080:8080 --name web-app \
               -e DB_USER='admin' \
               -e DB_PASS='${{ secrets.DB_PASS }}' \
               -e DB_HOST='db-uts-sondang.cps0acgo6m1b.ap-southeast-2.rds.amazonaws.com' \
-              -e DB_NAME='db_uts_sondang' \
-              -e AWS_REGION='ap-southeast-1' \
+              -e DB_NAME='mysql' \
+              -e AWS_REGION='ap-southeast-2' \
               -e S3_BUCKET='uts-cloud-sondang-bucket' \
               -e AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}' \
               -e AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
