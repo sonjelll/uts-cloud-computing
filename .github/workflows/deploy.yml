@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
@@ -19,15 +19,20 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Pindah ke folder aplikasi (atau clone jika belum ada)
+            # 1. Install Docker secara otomatis
+            sudo apt-get update -y
+            sudo apt-get install docker.io -y
+            sudo systemctl start docker
+            
+            # 2. Pindah ke folder aplikasi (atau clone jika belum ada)
             git clone https://github.com/sonjelll/uts-cloud-computing.git temp-app || true
             cd temp-app && git pull origin main
             
-            # Hentikan dan hapus container lama agar tidak bentrok
+            # 3. Hentikan dan hapus container lama agar tidak bentrok
             sudo docker stop web-app || true
             sudo docker rm web-app || true
             
-            # Build dan jalankan Docker baru
+            # 4. Build dan jalankan Docker baru
             sudo docker build -t cloud-app .
             sudo docker run -d -p 8080:8080 --name web-app \
               -e DB_HOST='db-uts-sondang.cps0acgo6m1b.ap-southeast-2.rds.amazonaws.com' \
